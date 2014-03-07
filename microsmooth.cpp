@@ -1,4 +1,4 @@
-#include "smoothing.h"
+#include "microsmooth.h"
 #include <math.h>
 
 int* init()
