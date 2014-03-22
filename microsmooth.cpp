@@ -1,35 +1,39 @@
 #include "microsmooth.h"
-#include <math.h>
 
-int* init()
+int* ms_init(uint8_t algo)
 {
-  ;
+    if(algo & SMA) return (int *)calloc(SMA_LENGTH, sizeof(int));
+    else if(algo & CMA) return NULL; 
+    else if(algo & EMA) return NULL;
+    else if(algo & SGA) return (int *)calloc(SG_LENGTH, sizeof(int));
+    else if(algo & KZF) return (int *)calloc(KZ_LENGTH, sizeof(int));
+    else if(algo & RDP) return (int *)calloc(RDP_LENGTH, sizeof(int));
 }
 
-int deinit()
+void deinit(void *ptr)
 {
-  ;
+    free(ptr);
 }
 
-extern int history_SMA[SMA_LENGTH] = {0,};
+//extern int history_SMA[SMA_LENGTH] = {0,};
 
-int simple_mov_avg(int current_value)
+int sma_filter(int current_value, int history_SMA[])
 {  
-  int average=0,sum=0;
-  for(int i=1;i<SMA_LENGTH;i++)
-  { 
-    history_SMA[i-1]=history_SMA[i];
-  }
-  
-  history_SMA[SMA_LENGTH-1]=current_value;
-  for(int j=0;j<SMA_LENGTH;j++)
-  {
-    sum+=history_SMA[j];
-  }
-  
-  average=sum/SMA_LENGTH;
-  
-  return average;
+    int average=0,sum=0;
+    for(int i=1;i<SMA_LENGTH;i++)
+    { 
+	history_SMA[i-1]=history_SMA[i];
+    }
+    history_SMA[SMA_LENGTH-1]=current_value;
+    
+    for(int j=0;j<SMA_LENGTH;j++)
+    {
+	sum+=history_SMA[j];
+    }
+    
+    average=sum/SMA_LENGTH;
+    
+    return average;
 }
 
 int cumulative_mov_avg(int current_value)  //Seems useless
