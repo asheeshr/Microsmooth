@@ -1,91 +1,90 @@
 #include "microsmooth.h"
 
-int* ms_init(uint8_t algo)
+uint16_t* ms_init(uint8_t algo)
 {
-    if(algo & SMA) return (int *)calloc(SMA_LENGTH, sizeof(int));
+    if(algo & SMA) return (uint16_t *)calloc(SMA_LENGTH, sizeof(uint16_t));
     else if(algo & CMA) return NULL; 
     else if(algo & EMA) return NULL;
-    else if(algo & SGA) return (int *)calloc(SG_LENGTH, sizeof(int));
-    else if(algo & KZF) return (int *)calloc(KZ_LENGTH, sizeof(int));
-    else if(algo & RDP) return (int *)calloc(RDP_LENGTH, sizeof(int));
+    else if(algo & SGA) return (uint16_t *)calloc(SGA_LENGTH, sizeof(uint16_t));
+    else if(algo & KZF) return (uint16_t *)calloc(KZ_LENGTH, sizeof(uint16_t));
+    else if(algo & RDP) return (uint16_t *)calloc(RDP_LENGTH, sizeof(uint16_t));
 }
 
-void deinit(void *ptr)
+void deinit(uint16_t *ptr)
 {
     free(ptr);
 }
 
-//extern int history_SMA[SMA_LENGTH] = {0,};
-
-int sma_filter(int current_value, int history_SMA[])
+int sma_filter(int current_value, uint16_t history_SMA[])
 {  
-    int average=0,sum=0;
-    for(int i=1;i<SMA_LENGTH;i++)
-    { 
+    uint16_t sum=0; /*This constrains SMA_LENGTH*/
+    uint16_t average=0;
+    uint8_t i;
+
+    for(i=1;i<SMA_LENGTH;i++)
+    {
 	history_SMA[i-1]=history_SMA[i];
     }
     history_SMA[SMA_LENGTH-1]=current_value;
     
-    for(int j=0;j<SMA_LENGTH;j++)
+    for(i=0;i<SMA_LENGTH;i++)
     {
-	sum+=history_SMA[j];
+	sum+=history_SMA[i];
     }
-    
     average=sum/SMA_LENGTH;
-    
+
     return average;
 }
 
-int cumulative_mov_avg(int current_value)  //Seems useless
+int cma_filter(int current_value, void * ptr)  //Seems useless
 { 
-  static unsigned long cumulative_average=0;
-  static unsigned long k=0;
-  k++;
-  
-  cumulative_average=(current_value+k*cumulative_average)/(k+1);
-  return cumulative_average;
-}
-
-int exponential_mov_avg(int current_value)
-{ 
-  static int exponential_average=current_value;
-  
-  exponential_average=EMA_ALPHA*current_value + (1-EMA_ALPHA)*exponential_average;
-  return exponential_average; 
-  
-}
-
-int history_SG[SG_LENGTH] = {0,};
-const long long coefficients[]={1512,-3780,-840,5040,10080,12012,10080,5040,-840,-3780,1512};
-const long long normalization_value=36036;
-
-
-int savitzky_golay(int current_value)
-{ 
-  long long sum=0;
-  int SG_MID = SG_LENGTH/2;
-  for(int i=1;i<SG_LENGTH;i++)
-  {
-         history_SG[i-1]=history_SG[i];
-  }
-  history_SG[SG_LENGTH-1]=current_value;
+    static uint16_t cumulative_average=0; /*Limiting factor for k*/
+    static uint16_t k=0; /*Limiting factor for runtime*/
     
-  for(int i=-SG_MID;i<=(SG_MID);i++)
-  {  
-    sum+=history_SG[i+SG_MID]*coefficients[i+SG_MID];
-  }
-  
-  history_SG[SG_MID]=sum/normalization_value;
-  
-  return history_SG[SG_MID];
-  
+    cumulative_average=(current_value+k*(uint32_t)cumulative_average)/(k+1);
+    k++;
+
+    return cumulative_average;
+}
+
+int ema_filter(int current_value, void * ptr)
+{ 
+    static uint16_t exponential_average=current_value;
+    
+    exponential_average=(EMA_ALPHA*(uint32_t)current_value + (100 - EMA_ALPHA)*(uint32_t)exponential_average)/100;
+    return exponential_average;
+}
+
+
+const int16_t coefficients[]={1512,-3780,-840,5040,10080,12012,10080,5040,-840,-3780,1512};
+const uint16_t normalization_value=36036;
+
+
+int sga_filter(int current_value, uint16_t history_SGA[])
+{ 
+    uint64_t sum=0;
+    uint8_t SGA_MID = SGA_LENGTH/2;
+    uint8_t i;
+    
+    for(i=1;i<SGA_LENGTH;i++)
+    {
+	history_SGA[i-1]=history_SGA[i];
+    }
+    history_SGA[SGA_LENGTH-1]=current_value;
+    
+    for(i=-SGA_MID;i<=(SGA_MID);i++)
+    {  
+	sum+=history_SGA[i+SGA_MID]*coefficients[i+SGA_MID];
+    }
+    
+    history_SGA[SGA_MID]=sum/normalization_value;
+    return history_SGA[SGA_MID];
 }
     
-int history_RDP[RDP_LENGTH] = {0,}; 
-//int index_RDP[]={0,};
+//int history_RDP[RDP_LENGTH] = {0,};
 
   
-void rdp(int start_index, int end_index)
+void rdp(int start_index, int end_index, uint16_t history_RDP[])
 {
   int a = history_RDP[end_index]-history_RDP[start_index];
   int b = -(end_index-start_index);
@@ -107,8 +106,8 @@ void rdp(int start_index, int end_index)
   
   if(max_distance>epsilon)
   { 
-        rdp(start_index,max_index);
-        rdp(max_index,end_index);
+      rdp(start_index,max_index, history_RDP[]);
+      rdp(max_index,end_index, history_RDP[]);
    } 
    else 
     
@@ -120,9 +119,9 @@ void rdp(int start_index, int end_index)
    }
 }
    
-int rdp_caller(int current_value)
+int rdp_filter(int current_value, uint16_t history_RDP[])
 { 
-  int update_value=history_RDP[0];
+  uint16_t update_value=history_RDP[0];
   for(int i=1;i<RDP_LENGTH;i++)
   { 
     history_RDP[i-1]=history_RDP[i];  
@@ -130,9 +129,60 @@ int rdp_caller(int current_value)
   
   history_RDP[RDP_LENGTH-1]=current_value;
   
-  rdp(0,RDP_LENGTH-1);
+  rdp(0,RDP_LENGTH-1); /*Recursive one*/
+  //rdp_iter()
+  /*
+  int stack[2][RDP_lENGTH/2], top, i=0, j=RDP_LENGTH-1;      
+top++;
+stack[0][top]=0;
+stack[1][top]=RDP_LENGTH-1;
+
+ while(top>-1)
+ {
+   start_index = stack[0][top];
+   end_index = stack[1][top];
+top--;
+
+  int a = history_RDP[end_index]-history_RDP[start_index];
+  int b = -(end_index-start_index);
+  int c = -start_index*a - history_RDP[start_index]*b;
+  
+  float max_distance = epsilon;
+  int max_index=-1;
+  float distance = 0;
+  
+  for( int i=start_index+1;i<end_index;i++)
+  {
+    distance=(i*a-history_RDP[i]*b+c)/sqrt(a^2+b^2);
+    if (distance>max_distance)
+    { 
+      max_distance=distance;
+      max_index=i;
+    }
+  }
+  
+  if(max_index!=-1)
+  {
+      top++;
+      stack[0][top]=start_index;
+      stack[1][top]=max_index;
+      top++;
+      stack[0][top]=max_index;
+      stack[1][top]=end_index;
+   } 
+   else 
+   {
+    for( int i=start_index+1;i<end_index;i++) 
+    {
+      history_RDP[i]=(-c-a*i)/b;
+    }
+   }
+
+
+   */
   return update_value;
 }
+
 
 int history_KZ[KZ_history_LENGTH] = {0,};
 int KZ_MID=(KZ_history_LENGTH)/2;
@@ -170,6 +220,4 @@ int kz_filter(int current_value)
   } 
    
   return history_KZ[KZ_MID];
-   
-    
 }
