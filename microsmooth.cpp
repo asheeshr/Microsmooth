@@ -1,4 +1,6 @@
 #include "microsmooth.h"
+#include <Arduino.h>
+//#include <Serial.h>
 
 uint16_t* ms_init(uint8_t algo)
 {
@@ -82,9 +84,9 @@ int sga_filter(int current_value, uint16_t history_SGA[])
 }
     
 //int history_RDP[RDP_LENGTH] = {0,};
-
+/*
   
-void rdp(int start_index, int end_index, uint16_t history_RDP[])
+void rdp_recur(int start_index, int end_index, uint16_t history_RDP[])
 {
   int a = history_RDP[end_index]-history_RDP[start_index];
   int b = -(end_index-start_index);
@@ -106,8 +108,8 @@ void rdp(int start_index, int end_index, uint16_t history_RDP[])
   
   if(max_distance>epsilon)
   { 
-      rdp(start_index,max_index, history_RDP[]);
-      rdp(max_index,end_index, history_RDP[]);
+      rdp_recur(start_index,max_index, history_RDP);
+      rdp_recur(max_index,end_index, history_RDP);
    } 
    else 
     
@@ -118,69 +120,76 @@ void rdp(int start_index, int end_index, uint16_t history_RDP[])
     }
    }
 }
+*/
    
 int rdp_filter(int current_value, uint16_t history_RDP[])
 { 
-  uint16_t update_value=history_RDP[0];
-  for(int i=1;i<RDP_LENGTH;i++)
-  { 
-    history_RDP[i-1]=history_RDP[i];  
-  }
-  
-  history_RDP[RDP_LENGTH-1]=current_value;
-  
-  rdp(0,RDP_LENGTH-1); /*Recursive one*/
-  //rdp_iter()
-  /*
-  int stack[2][RDP_lENGTH/2], top, i=0, j=RDP_LENGTH-1;      
-top++;
-stack[0][top]=0;
-stack[1][top]=RDP_LENGTH-1;
+    uint32_t a, b, c;
+    int8_t top=-1;
+    uint8_t istack[2][RDP_LENGTH], i, j, start_index, end_index, max_index;
+    float max_distance, distance; 
 
- while(top>-1)
- {
-   start_index = stack[0][top];
-   end_index = stack[1][top];
-top--;
-
-  int a = history_RDP[end_index]-history_RDP[start_index];
-  int b = -(end_index-start_index);
-  int c = -start_index*a - history_RDP[start_index]*b;
-  
-  float max_distance = epsilon;
-  int max_index=-1;
-  float distance = 0;
-  
-  for( int i=start_index+1;i<end_index;i++)
-  {
-    distance=(i*a-history_RDP[i]*b+c)/sqrt(a^2+b^2);
-    if (distance>max_distance)
+    for(i=1;i<RDP_LENGTH;i++)
     { 
-      max_distance=distance;
-      max_index=i;
+	history_RDP[i-1]=history_RDP[i];  
     }
-  }
+    history_RDP[RDP_LENGTH-1]=current_value;
+
+//rdp_recur(0,RDP_LENGTH-1); /*Recursive one*/
+//rdp_iter()
   
-  if(max_index!=-1)
-  {
-      top++;
-      stack[0][top]=start_index;
-      stack[1][top]=max_index;
-      top++;
-      stack[0][top]=max_index;
-      stack[1][top]=end_index;
-   } 
-   else 
-   {
-    for( int i=start_index+1;i<end_index;i++) 
+    top++;
+    istack[0][top]=0;
+    istack[1][top]=RDP_LENGTH-1;
+
+//    Serial.println("Going in");
+    while(top>-1)
     {
-      history_RDP[i]=(-c-a*i)/b;
+	start_index = istack[0][top];
+	end_index = istack[1][top];
+	top--;
+
+	a = history_RDP[end_index]-history_RDP[start_index];
+	b = -(end_index-start_index);
+	c = -start_index*a - history_RDP[start_index]*b;
+  
+	max_distance = epsilon;
+	max_index = start_index;
+	distance = 0;
+	
+	for(i=start_index+1;i<end_index;i++)
+	{
+	    distance=abs((i*a-history_RDP[i]*b+c))/sqrt(a^2+b^2);
+//	    Serial.println(distance);
+	    if(distance>max_distance)
+	    { 
+		max_distance=distance;
+		max_index=i;
+	    }
+	}
+
+//	Serial.println(max_index);  
+	if(max_index!=start_index)
+	{
+	    Serial.println("In push");
+	    top++;
+	    istack[0][top]=start_index;
+	    istack[1][top]=max_index;
+	    top++;
+	    istack[0][top]=max_index;
+	    istack[1][top]=end_index;
+	} 
+	else 
+	{
+//	    	Serial.println("in here");
+	    for(i=start_index+1;i<end_index;i++) 
+	    {
+		history_RDP[i]=(-c-a*i)/b;
+	    }
+	}
+	Serial.println(top);
     }
-   }
-
-
-   */
-  return update_value;
+    return history_RDP[0];
 }
 
 

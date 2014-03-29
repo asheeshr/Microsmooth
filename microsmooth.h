@@ -17,7 +17,7 @@
 #define SMA_LENGTH 5
 #define EMA_ALPHA 10 /*This is in percentage. Should be between 0-99*/
 #define SGA_LENGTH 11
-#define RDP_LENGTH 11
+#define RDP_LENGTH 5
 #define epsilon 50
 #define KZ_LENGTH 5
 #define KZ_MAX 4
