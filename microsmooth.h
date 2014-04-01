@@ -1,6 +1,6 @@
 /*Standard Library Dependencies*/
 #include <stdint.h>
-#include <math.h>
+//#include <math.h>
 #include <stdlib.h>
 
 #ifndef MICROSMOOTH
@@ -17,7 +17,7 @@
 #define SMA_LENGTH 5
 #define EMA_ALPHA 10 /*This is in percentage. Should be between 0-99*/
 #define SGA_LENGTH 11
-#define RDP_LENGTH 5
+#define RDP_LENGTH 7
 #define epsilon 50
 #define KZ_LENGTH 5
 #define KZ_MAX 4
@@ -25,7 +25,7 @@
 
 
 extern int history_KZ[KZ_history_LENGTH];
-extern int history_RDP[RDP_LENGTH];
+//extern int history_RDP[RDP_LENGTH];
 extern int index_RDP[];
 
 

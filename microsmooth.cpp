@@ -2,6 +2,18 @@
 #include <Arduino.h>
 //#include <Serial.h>
 
+int sq_rt(int n)
+{
+    int i=40, i_old;
+    while(i!=i_old)
+    {
+	i_old=i;
+	i=(i*i-n>0)?i:i-1;
+    }
+    return i;
+}
+
+
 uint16_t* ms_init(uint8_t algo)
 {
     if(algo & SMA) return (uint16_t *)calloc(SMA_LENGTH, sizeof(uint16_t));
@@ -124,10 +136,10 @@ void rdp_recur(int start_index, int end_index, uint16_t history_RDP[])
    
 int rdp_filter(int current_value, uint16_t history_RDP[])
 { 
-    uint32_t a, b, c;
-    int8_t top=-1;
-    uint8_t istack[2][RDP_LENGTH], i, j, start_index, end_index, max_index;
-    float max_distance, distance; 
+    long a, b, c;
+    int top=-1;
+    int istack[2][RDP_LENGTH], i, j, start_index, end_index, max_index;
+    double max_distance, distance; 
 
     for(i=1;i<RDP_LENGTH;i++)
     { 
@@ -153,13 +165,17 @@ int rdp_filter(int current_value, uint16_t history_RDP[])
 	b = -(end_index-start_index);
 	c = -start_index*a - history_RDP[start_index]*b;
   
+	//Serial.print("a:");Serial.print(a);
+	//Serial.print("b:");Serial.print(b);
+	//Serial.print("c:");Serial.println(c);
 	max_distance = epsilon;
 	max_index = start_index;
 	distance = 0;
 	
 	for(i=start_index+1;i<end_index;i++)
 	{
-	    distance=abs((i*a-history_RDP[i]*b+c))/sqrt(a^2+b^2);
+	    distance=abs(((i*a-history_RDP[i]*b+c))/int(sq_rt(a*a+b*b)));
+//	    Serial.print("Dist:");
 //	    Serial.println(distance);
 	    if(distance>max_distance)
 	    { 
@@ -168,10 +184,11 @@ int rdp_filter(int current_value, uint16_t history_RDP[])
 	    }
 	}
 
+//	Serial.print("MaxIndex:");
 //	Serial.println(max_index);  
 	if(max_index!=start_index)
 	{
-	    Serial.println("In push");
+//	    Serial.println("In push");
 	    top++;
 	    istack[0][top]=start_index;
 	    istack[1][top]=max_index;
@@ -184,10 +201,11 @@ int rdp_filter(int current_value, uint16_t history_RDP[])
 //	    	Serial.println("in here");
 	    for(i=start_index+1;i<end_index;i++) 
 	    {
-		history_RDP[i]=(-c-a*i)/b;
+		history_RDP[i]=int((-c-a*i)/b);
+//		Serial.println(history_RDP[i]);
 	    }
 	}
-	Serial.println(top);
+//	Serial.println(top);
     }
     return history_RDP[0];
 }
