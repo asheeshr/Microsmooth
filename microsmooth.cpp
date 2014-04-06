@@ -2,13 +2,12 @@
 #include <Arduino.h>
 //#include <Serial.h>
 
-int sq_rt(int n)
+float sq_rt(int n)
 {
-    int i=40, i_old;
-    while(i!=i_old)
+    int i=40;
+    for(int j=0; j<6; j++)
     {
-	i_old=i;
-	i=(i*i-n>0)?i:i-1;
+	i = (i + n/i)>>1;
     }
     return i;
 }
@@ -136,10 +135,12 @@ void rdp_recur(int start_index, int end_index, uint16_t history_RDP[])
    
 int rdp_filter(int current_value, uint16_t history_RDP[])
 { 
-    long a, b, c;
-    int top=-1;
-    int istack[2][RDP_LENGTH], i, j, start_index, end_index, max_index;
-    double max_distance, distance; 
+    int16_t a; 
+    int8_t b;
+    int16_t c;
+    int8_t top=-1;
+    int8_t istack[2][RDP_LENGTH], i, j, start_index, end_index, max_index;
+    double max_distance, distance, denom; 
 
     for(i=1;i<RDP_LENGTH;i++)
     { 
@@ -171,10 +172,11 @@ int rdp_filter(int current_value, uint16_t history_RDP[])
 	max_distance = epsilon;
 	max_index = start_index;
 	distance = 0;
+	denom = sq_rt(a*a+b*b);
 	
 	for(i=start_index+1;i<end_index;i++)
 	{
-	    distance=abs(((i*a-history_RDP[i]*b+c))/int(sq_rt(a*a+b*b)));
+	    distance=abs((i*a-history_RDP[i]*b+c)/denom);
 //	    Serial.print("Dist:");
 //	    Serial.println(distance);
 	    if(distance>max_distance)
@@ -201,7 +203,8 @@ int rdp_filter(int current_value, uint16_t history_RDP[])
 //	    	Serial.println("in here");
 	    for(i=start_index+1;i<end_index;i++) 
 	    {
-		history_RDP[i]=int((-c-a*i)/b);
+		history_RDP[i]=abs(int((-c-a*i)/b)); 
+                //Will this be negative?
 //		Serial.println(history_RDP[i]);
 	    }
 	}
