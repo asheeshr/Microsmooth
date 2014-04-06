@@ -19,7 +19,7 @@ uint16_t* ms_init(uint8_t algo)
     else if(algo & CMA) return NULL; 
     else if(algo & EMA) return NULL;
     else if(algo & SGA) return (uint16_t *)calloc(SGA_LENGTH, sizeof(uint16_t));
-    else if(algo & KZF) return (uint16_t *)calloc(KZ_LENGTH, sizeof(uint16_t));
+    else if(algo & KZA) return (uint16_t *)calloc(KZA_LENGTH, sizeof(uint16_t));
     else if(algo & RDP) return (uint16_t *)calloc(RDP_LENGTH, sizeof(uint16_t));
 }
 
@@ -214,8 +214,8 @@ int rdp_filter(int current_value, uint16_t history_RDP[])
 }
 
 
-int history_KZ[KZ_history_LENGTH] = {0,};
-int KZ_MID=(KZ_history_LENGTH)/2;
+//int history_KZ[KZ_history_LENGTH] = {0,};
+//int KZ_MID=(KZ_history_LENGTH)/2;
 const long coefficients_k[][17]={{0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0},
                                  {0,0,0,0,1,2,3,4,5,4,3,2,1,0,0,0,0},
                                  {0,0,1,3,6,10,15,18,19,18,15,10,6,3,1,0,0},
@@ -223,31 +223,30 @@ const long coefficients_k[][17]={{0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0},
 //const long coefficients_k3[]={1,3,6,10,15,18,19,18,15,10,6,3,1};
 //const long coefficients_k4[]={1,4,10,20,35,52,68,80,85,80,68,52,35,20,10,4,1};
 
-int kz_filter(int current_value)
+int kza_filter(int current_value, uint16_t history_KZA[])
 { 
-  long divisor=1;
-  long updated_value=0; 
-  for(int i=1;i<KZ_history_LENGTH;i++)
+  uint32_t divisor=1;
+  uint32_t updated_value=0; 
+  int8_t i,k;
+
+  for(i=1;i<KZA_HISTORY_LENGTH;i++)
   {
-         history_KZ[i-1]=history_KZ[i];
+         history_KZA[i-1]=history_KZA[i];
   }
-  
-  history_KZ[KZ_history_LENGTH-1]=current_value;
+  history_KZA[KZA_HISTORY_LENGTH-1]=current_value;
     
-  for(int k=1;k<=3;k++)
-  {  
-    
-    for(int i=-k*(KZ_LENGTH-1)/2;i<=k*(KZ_LENGTH-1)/2;i++)
+  for(k=1;k<=3;k++)
+  {
+    for(i=-k*(KZA_LENGTH-1)/2;i<=k*(KZA_LENGTH-1)/2;i++)
     {
-      updated_value+=history_KZ[i+KZ_MID]*coefficients_k[k-1][i+KZ_MID];
+      updated_value+=history_KZA[i+KZA_MID]*coefficients_k[k-1][i+KZA_MID];
     } 
-    divisor*=KZ_LENGTH;
+    divisor*=KZA_LENGTH;
     updated_value/=divisor;
-    history_KZ[KZ_MID]=updated_value;
+    history_KZA[KZA_MID]=updated_value;
    
     updated_value=0;
-
   } 
-   
-  return history_KZ[KZ_MID];
+
+  return history_KZA[KZA_MID];
 }
