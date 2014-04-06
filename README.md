@@ -10,7 +10,7 @@ This library provides implementations of signal processing algorithms like:
 - Exponential Moving Average (`EMA`)
 - Savitzky Golay Filter (`SGA`)
 - Ramer Douglas Peucker Algorithm (`RDP`)
-- Kolmogorov Zurbenko Filter (`KZF`)
+- Kolmogorov Zurbenko Algorithm (`KZA`)
 
 The library can be used as shown below:
 
@@ -26,5 +26,3 @@ The filters all have the same interface:
 where `<Three digit code>` can be `sma`, `cma`, `ema`, `rdp`, `sga`, `kza`.
 
 
----
-Being developed as part of an academic project by Asheesh Ranjan and Pranav Jetley
