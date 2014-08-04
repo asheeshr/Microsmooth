@@ -23,21 +23,38 @@ on tuning these parameters.
 */
 
 /*Simple Moving Average - Length of window */
+#ifndef SMA_LENGTH
 #define SMA_LENGTH 5
+#endif
 
 /*Exponential Moving Average - Alpha parameter */
+#ifndef EMA_ALPHA
 #define EMA_ALPHA 10 /*This is in percentage. Should be between 0-99*/
+#endif
 
 /*Savitzky Golay Filter -  */
+#ifndef SGA_LENGTH
 #define SGA_LENGTH 11
+#endif
 
 /*Ramer Douglas Peucker -  */
+#ifndef RDP_LENGTH
 #define RDP_LENGTH 7
+#endif
+
+#ifndef epsilon
 #define epsilon 50
+#endif
 
 /*Kolmogorov Zurbenko Filter-  */
+#ifndef KZA_LENGTH
 #define KZA_LENGTH 5
+#endif
+
+#ifndef KZA_MAX
 #define KZA_MAX 4
+#endif
+
 #define KZA_HISTORY_LENGTH ((KZA_LENGTH-1)*KZA_MAX)
 #define KZA_MID (KZA_HISTORY_LENGTH)/2
 
