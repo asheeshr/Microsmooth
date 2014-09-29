@@ -24,6 +24,7 @@ You should have received a copy of the GNU General Public License along with thi
 #define SGA 0b00001000
 #define KZA 0b00010000
 #define RDP 0b00100000
+#define KFA 0b01000000
 
 /*Algorithm Parameters*/
 
@@ -45,8 +46,20 @@ on tuning these parameters.
 
 /*Savitzky Golay Filter -  */
 #ifndef SGA_LENGTH
-#define SGA_LENGTH 11
+#define SGA_LENGTH 5 /* Window may 5, 7 or 9. 
+			 For window 5, only quadratic or cubic smoothing may be used */
 #endif
+
+#ifndef SGA_DEGREE
+#define SGA_DEGREE 3 /* For quadratic or cubic smoothing, enter degree 3. 
+			For quartic or quintic smoothing, enter degree 4.*/
+#endif
+
+#ifndef SGA_INDEX
+#define SGA_INDEX (SGA_DEGREE - SGA_LENGTH + 2)
+#endif
+
+#define SGA_MAX_LENGTH 9 /* Do not change */
 
 /*Ramer Douglas Peucker -  */
 #ifndef RDP_LENGTH
@@ -59,23 +72,26 @@ on tuning these parameters.
 
 /*Kolmogorov Zurbenko Filter-  */
 #ifndef KZA_LENGTH
-#define KZA_LENGTH 5
+#define KZA_LENGTH 5 /* Window size may 3, 5, or 7 */
 #endif
 
 #ifndef KZA_MAX
-#define KZA_MAX 4
+#define KZA_MAX 4 /* Number of iterations may be 2, 3 or 4 */
 #endif
 
 #define KZA_HISTORY_LENGTH ((KZA_LENGTH-1)*KZA_MAX)
 #define KZA_MID (KZA_HISTORY_LENGTH)/2
+
+/*Function Prototypes*/
 
 uint16_t* ms_init(uint8_t );
 int sma_filter(int current_value, uint16_t history_SMA[]);
 int cma_filter(int current_value, void * ptr); /*Pointer not needed. Maintaining consistent interface*/
 int ema_filter(int current_value, void * ptr); /*Pointer not needed. Maintaining consistent interface*/
 int sga_filter(int current_value, uint16_t history_SGA[]); /*Needs to be tested*/
-int kza_filter(int current_value);
+int kza_filter(int current_value, uint16_t history_KZA[]);
 int rdp_filter(int current_value, uint16_t history_RDP[]);/*Iterative neeeds testing*/
-void ms_deinit(int *);
+int kfa_filter(int current_value, uint16_t history_KFA[]);/*Iterative neeeds testing*/
+void ms_deinit(uint16_t *);
 
 #endif
