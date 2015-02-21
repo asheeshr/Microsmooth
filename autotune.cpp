@@ -1,4 +1,4 @@
-#include "automicrosmooth.h"
+#include "autotune.h"
 
 int ams_init()
 {
@@ -49,7 +49,7 @@ void ams_tuning()
 	break;
 
     default:
-	Serial.println("Invalid option.")
+	    Serial.println("Invalid option.");
     }
     
 
