@@ -37,10 +37,12 @@ The filters all have the same interface:
     <Three digit code>_filter(channel_value, history)
 where `<Three digit code>` can be `sma`, `cma`, `ema`, `rdp`, `sga`, `kza`.
 
+##Code Sample
+
+A simple code sample for using any of the filters in the library is available [here](https://gist.github.com/asheeshr/bc87f8c6486f649ef029).
+
 ##Performance Analysis
 
 The best performing filter at present is `EMA` with alpha parameter `0.10`.
 
 The ranking strategy for the filters is discussed in this [paper](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6849804). 
-
-
