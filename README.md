@@ -18,9 +18,9 @@ This library provides implementations of signal processing algorithms like:
 
 Use the standard process for Arduino libraries. The following steps are involved:
 
-- Create a libraries folder in your Sketchbook
-- Git clone, or download and extract, the library in that folder. So, your sketchbook should have the following structure -> /libraries/microsmooth/microsmooth.[cpp|h] and additional files.
-- In your sketch, add #include <microsmooth.h> and compile. 
+- Create a folder `libraries` in your Sketchbook
+- Git clone, or download and extract, this library in that folder. So, your sketchbook should have the following structure -> `/libraries/microsmooth/microsmooth.[cpp|h]` and additional files.
+- In your sketch, add `#include <microsmooth.h>` and compile. 
 
 ##Usage
 
