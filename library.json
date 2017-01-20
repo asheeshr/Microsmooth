@@ -1,0 +1,12 @@
+{
+  "name": "Microsmooth",
+  "keywords": "smoothing, smooth, Average, Exponential, Cumulative, Savitzky",
+  "description": "A lightweight and fast signal smoothing library for the Arduino platform",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/asheeshr/Microsmooth.git"
+  },
+  "frameworks": "arduino",
+  "platforms": "*"
+}
