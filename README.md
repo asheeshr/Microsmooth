@@ -1,7 +1,7 @@
 Microsmooth
 ===========
 
-##Introduction
+## Introduction
 
 A lightweight and fast signal smoothing library for the Arduino platform.
 
@@ -14,7 +14,7 @@ This library provides implementations of signal processing algorithms like:
 - Ramer Douglas Peucker Algorithm (`RDP`)
 - Kolmogorov Zurbenko Algorithm (`KZA`)
 
-##Installation
+## Installation
 
 Use the standard process for Arduino libraries. The following steps are involved:
 
@@ -22,7 +22,7 @@ Use the standard process for Arduino libraries. The following steps are involved
 - Git clone, or download and extract, this library in that folder. So, your sketchbook should have the following structure -> `/libraries/microsmooth/microsmooth.[cpp|h]` and additional files.
 - In your sketch, add `#include <microsmooth.h>` and compile. 
 
-##Usage
+## Usage
 
 The library can be used as shown below:
 
@@ -37,11 +37,11 @@ The filters all have the same interface:
     <Three digit code>_filter(channel_value, history)
 where `<Three digit code>` can be `sma`, `cma`, `ema`, `rdp`, `sga`, `kza`.
 
-##Code Sample
+## Code Sample
 
 A simple code sample for using any of the filters in the library is available [here](https://gist.github.com/asheeshr/bc87f8c6486f649ef029).
 
-##Performance Analysis
+## Performance Analysis
 
 The best performing filter at present is `EMA` with alpha parameter `0.10`.
 
