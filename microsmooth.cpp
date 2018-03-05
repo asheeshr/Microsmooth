@@ -204,7 +204,7 @@ int rdp_filter(int current_value, uint16_t history_RDP[])
 	//Serial.print("a:");Serial.print(a);
 	//Serial.print("b:");Serial.print(b);
 	//Serial.print("c:");Serial.println(c);
-	max_distance = epsilon;
+	max_distance = SMOOTH_EPSILON;
 	max_index = start_index;
 	distance = 0;
 	denom = sq_rt(a*a+b*b);
