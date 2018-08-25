@@ -66,8 +66,8 @@ on tuning these parameters.
 #define RDP_LENGTH 7
 #endif
 
-#ifndef epsilon
-#define epsilon 50
+#ifndef SMOOTH_EPSILON
+#define SMOOTH_EPSILON 50
 #endif
 
 /*Kolmogorov Zurbenko Filter-  */
