@@ -60,6 +60,7 @@ uint16_t* ms_init(uint8_t algo)
     else if(algo & KFA) 
     {
     }
+    return NULL;
 }
 
 void deinit(uint16_t *ptr)
@@ -112,7 +113,8 @@ int sga_filter(int current_value, uint16_t history_SGA[])
 { 
     uint64_t sum=0;
     uint8_t SGA_MID = SGA_LENGTH/2;
-    uint8_t i;
+    int8_t i;
+    uint8_t SGA_COEF_OFFSET = (SGA_MAX_LENGTH - SGA_LENGTH) / 2;
 
     for(i=1;i<SGA_LENGTH;i++)
     {
@@ -122,7 +124,7 @@ int sga_filter(int current_value, uint16_t history_SGA[])
     
     for(i=-SGA_MID;i<=(SGA_MID);i++)
     {  
-	sum+=history_SGA[i+SGA_MID]*sga_coefficients[SGA_INDEX][i+SGA_MID];
+	sum += history_SGA[i + SGA_MID] * sga_coefficients[SGA_INDEX][i + SGA_MID + SGA_COEF_OFFSET];
     }
     
     history_SGA[SGA_MID]=sum/normalization_value;
